@@ -1,4 +1,4 @@
-require('dotenv').config();
+// require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -12,8 +12,8 @@ app.use(cors({
   origin: 'https://black-coffer-assignment-backend.vercel.app/'
 }));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_KEY, {
+
+mongoose.connect("mongodb+srv://user1234:hellouser@cluster0.jjghdhu.mongodb.net/?retryWrites=true&w=majority", {
   useUnifiedTopology: true,
   useNewUrlParser: true
 })
@@ -24,7 +24,7 @@ mongoose.connect(process.env.MONGODB_KEY, {
   console.log('DB connection error:', err);
 });
 
-// Define the Insight schema
+
 const InsightSchema = new mongoose.Schema({
   impact: String,
   intensity: Number,
