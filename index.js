@@ -8,7 +8,9 @@ const axios = require('axios');
 const app = express();
 app.use(bodyParser.json());
 
-app.use(cors());
+app.use(cors({
+  origin: 'https://black-coffer-assignment-backend.vercel.app/'
+}));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_KEY, {
