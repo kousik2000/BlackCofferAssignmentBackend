@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: 'https://black-coffer-assignment-backend.vercel.app/'
+  origin: 'https://black-coffer-assignment-backend.vercel.app'
 }));
 
 
