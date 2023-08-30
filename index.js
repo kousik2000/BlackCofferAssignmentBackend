@@ -3,13 +3,13 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bodyParser = require('body-parser');
-const axios = require('axios');
+// const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json());
 
 app.use(cors({
-  origin: 'https://black-coffer-assignment-frontend.vercel.app'
+  origin: 'https://localhost:3000'
 }));
 
 
@@ -88,48 +88,45 @@ app.delete('/deletedata/:id', async (req, res) => {
 
 
 app.get('/getIntensity', async (req, res) => {
-    try {
-        const { country, sector, topic } = req.query;
+  try {
+    const { country, sector, topic } = req.query;
 
-        const apiUrl = `http://localhost:9000/getdata?country=${country}&sector=${sector}&topic=${topic}`;
+    const intensityData = await Insight.find({
+      country: country,
+      sector: sector,
+      topic: topic
+    });
 
-        const response = await axios.get(apiUrl);
-        const intensityData = response.data;
+    const chartData = {};
 
-        const chartData = {};
+    intensityData.forEach(entry => {
+      if (entry.start_year !== null && entry.end_year !== null) {
+        const label = `${entry.start_year}-${entry.end_year}`;
+        chartData[label] = entry.intensity;     
+      } else if (entry.start_year === null) {
+        const label = `Unknown-${entry.end_year}`;
+        chartData[label] = entry.intensity; 
+      } else if (entry.end_year === null) {
+        const label = `${entry.start_year}-Unknown`;
+        chartData[label] = entry.intensity; 
+      } else if (entry.start_year === null && entry.end_year === null) {
+        const label = "Unknown";
+        chartData[label] = entry.intensity; 
+      }
+    });
 
-        intensityData.forEach(entry => {
-            if (entry.country === country && entry.sector === sector && entry.topic === topic) {
-                
-                if (entry.start_year !== null && entry.end_year !== null) {
-                    const label = `${entry.start_year}-${entry.end_year}`;
-                    chartData[label] = entry.intensity;     
-                } else if (entry.start_year === null) {
-                    const label = `Unknown-${entry.end_year}`;
-                    chartData[label] = entry.intensity; 
-                } else if (entry.end_year === null) {
-                    const label = `${entry.start_year}-Unknown`;
-                    chartData[label] = entry.intensity; 
-                } else if (entry.start_year === null && entry.end_year === null) {
-                    const label = "Unknown";
-                    chartData[label] = entry.intensity; 
-                }
-            }
-        });
-
-        if (Object.keys(chartData).length > 0) {
-            res.json(chartData);
-        } else {
-            res.status(404).json({ error: 'No matching data found' });
-        }
-    } catch (error) {
-        console.error('Error fetching intensity data:', error);
-        res.status(500).json({ error: 'Internal server error' });
+    if (Object.keys(chartData).length > 0) {
+      res.json(chartData);
+    } else {
+      res.status(404).json({ error: 'No matching data found' });
     }
+  } catch (error) {
+    console.error('Error fetching intensity data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 
-  
 
 
 app.listen(9000, () => {
